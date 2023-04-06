@@ -16,6 +16,14 @@ spec:
         - name: tickets
           image: shahab/tickets:0.1
           env: # dar inja ba kubectl ye env secret misazim va adresesh ro nja midim video shomare 161
+            - name: NATS_CLIENT_ID
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name # dar inja chon bayad chon agar bekhaim chandta lisener ticket besazim bayad meghdar in variable uniqe bashe
+            - name: NATS_URL
+              value: 'http://nats-srv:4222'
+            - name: NATS_CLUSTER_ID
+              value: ticketing
             - name: MONGO_URI
               value: 'mongodb://tickets-mongo-srv:27017/tickets'
             - name: JWT_KEY

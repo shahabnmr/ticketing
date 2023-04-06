@@ -10,8 +10,23 @@ const start = async () => {
   if (!process.env.MONGO_URI) {
     throw new Error('MONGO_URI must be defined');
   }
+
+  if (!process.env.NATS_CLIENT_ID) {
+    throw new Error('NATS_CLIENT)ID must be defined');
+  }
+  if (!process.env.NATS_URL) {
+    throw new Error('NATS_URL must be defined');
+  }
+  if (!process.env.NATS_CLUSTER_ID) {
+    throw new Error('NATS_CLUSTER_ID must be defined');
+  }
+
   try {
-    await natsWrapper.connect('ticketing', 'sdfedfa', 'http://nats-srv:4222');
+    await natsWrapper.connect(
+      process.env.NATS_CLUSTER_ID,
+      process.env.NATS_CLIENT_ID,
+      process.env.NATS_URL
+    );
     natsWrapper.client.on('close', () => {
       //inkaro anjam midim ke ba harbar restart shodane listener dobare ye listener dige nasaze va ghabli ro kill dar nazar nagire
       console.log('NATS connection Closed');
