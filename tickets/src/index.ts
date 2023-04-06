@@ -12,6 +12,15 @@ const start = async () => {
   }
   try {
     await natsWrapper.connect('ticketing', 'sdfedfa', 'http://nats-srv:4222');
+    natsWrapper.client.on('close', () => {
+      //inkaro anjam midim ke ba harbar restart shodane listener dobare ye listener dige nasaze va ghabli ro kill dar nazar nagire
+      console.log('NATS connection Closed');
+      process.exit();
+    });
+
+    process.on('SIGINT', () => natsWrapper.client.close()); // ina ham baraye hamon elati ke dar close neveshte shode neveshte shode
+    process.on('SIGTERM', () => natsWrapper.client.close());
+
     await mongoose.connect(process.env.MONGO_URI);
     console.log('connected to mongodb-tickets');
   } catch (err) {
