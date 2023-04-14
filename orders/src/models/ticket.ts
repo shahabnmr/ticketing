@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import { updateIfCurrentPlugin } from 'mongoose-update-if-current';
 import { Order, OrderStatus } from './order';
 
 interface TicketAttrs {
@@ -10,11 +11,16 @@ interface TicketAttrs {
 export interface TicketDoc extends mongoose.Document {
   title: string;
   price: number;
+  version: number;
   isReserved(): Promise<boolean>;
 }
 
 interface TicketModel extends mongoose.Model<TicketDoc> {
   build(attrs: TicketAttrs): TicketDoc;
+  findByEvent(event: {
+    id: string;
+    version: number;
+  }): Promise<TicketDoc | null>;
 }
 
 const ticketSchema = new mongoose.Schema(
@@ -39,11 +45,31 @@ const ticketSchema = new mongoose.Schema(
   }
 );
 
+ticketSchema.set('versionKey', 'version');
+// ticketSchema.plugin(updateIfCurrentPlugin);
+
+ticketSchema.pre('save', function (done) {//*** */
+  // in ravesh vase ine ke age increment version be jaye yeki yeki bere bala maslan khastim 10 ta 10 ta bere bala dige nemishe az raveshe mongoose-uf-current-user estefade kard va in karo mikonim
+  // @ts-ignore
+  this.$where = {
+    version: this.get('version') - 1,
+  };
+
+  done();
+});
+
 ticketSchema.statics.build = (attrs: TicketAttrs) => {
   return new Ticket({
     _id: attrs.id,
     title: attrs.title,
     price: attrs.price,
+  });
+};
+
+ticketSchema.statics.findByEvent = (event: { id: string; version: number }) => {
+  return Ticket.findOne({
+    _id: event.id,
+    version: event.version - 1,
   });
 };
 
