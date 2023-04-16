@@ -1,4 +1,6 @@
 import mongoose from 'mongoose';
+import { OrderCancelledListener } from './events/listeners/order-cancelled-listener';
+import { OrderCreatedListener } from './events/listeners/order-created-listener';
 
 import { app } from './app';
 import { natsWrapper } from './nats-wrapper';
@@ -35,6 +37,9 @@ const start = async () => {
 
     process.on('SIGINT', () => natsWrapper.client.close()); // ina ham baraye hamon elati ke dar close neveshte shode neveshte shode
     process.on('SIGTERM', () => natsWrapper.client.close());
+
+    new OrderCreatedListener(natsWrapper.client).listen();
+    new OrderCancelledListener(natsWrapper.client).listen();
 
     await mongoose.connect(process.env.MONGO_URI);
     console.log('connected to mongodb-tickets');
