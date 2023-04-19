@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: expiration-depl
+spec:
+  replicas: 1
+  selector:
+    matchLabels: # dar inja darim podi ke gharare paintar besazim ro behesh midim
+      app: expiration
+  template:
+    metadata:
+      labels:
+        app: expiration
+    spec:
+      containers:
+        - name: expiration
+          image: shahab/expiration:0.1
+          env: # dar inja ba kubectl ye env secret misazim va adresesh ro nja midim video shomare 161
+            - name: NATS_CLIENT_ID
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name # dar inja chon bayad chon agar bekhaim chandta lisener ticket besazim bayad meghdar in variable uniqe bashe
+            - name: NATS_URL
+              value: 'http://nats-srv:4222'
+            - name: NATS_CLUSTER_ID
+              value: ticketing
+            - name: REDIS_HOST
+              value: expiration-redis-srv
