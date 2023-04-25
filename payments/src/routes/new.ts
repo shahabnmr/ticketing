@@ -10,6 +10,9 @@ import {
 } from '@mrshahabtickets/common';
 import { stripe } from '../stripe';
 import { Order } from '../models/order';
+import { Payment } from '../models/payment';
+import { PaymentCreatedPublisher } from '../events/publishers/payment-created-publisher';
+import { natsWrapper } from '../nats-wrapper';
 
 const router = express.Router();
 
@@ -32,19 +35,26 @@ router.post(
     if (order.status === OrderStatus.Cancelled) {
       throw new BadRequestError('cannot pay for an cancelled order');
     }
-    console.log({
-      amount: order.price * 100, //because base on cents
-      currency: 'usd',
-      source: token,
+
+    // const charge = await stripe.charges.create({
+    //   currency: 'usd',
+    //   amount: order.price * 100, //because base on cents
+    //   source: token,
+    //   description: 'description',
+    // });
+
+    const payment = Payment.build({
+      orderId,
+      stripeId: '123qweasdzxc', //charge.id
+    });
+    await payment.save();
+    new PaymentCreatedPublisher(natsWrapper.client).publish({
+      id: payment.id,
+      orderId: payment.orderId,
+      stripeId: payment.stripeId,
     });
 
-    await stripe.charges.create({
-      currency: 'usd',
-      amount: order.price * 100, //because base on cents
-      source: token,
-    });
-
-    res.send({ success: true });
+    res.status(201).send({ id: payment.id });
   }
 );
 
