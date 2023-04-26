@@ -17,4 +17,4 @@ jobs:
         env:
           DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
           DOCKER_PASS: ${{ secrets.DOCKER_PASS }}
-      - run: docker push shahab/auth
+      - run: docker push shahabnamvar/auth
