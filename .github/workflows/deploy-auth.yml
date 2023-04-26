@@ -8,10 +8,9 @@ on:
       - 'auth/**'
 
 jobs:
-  build:
+  deployment:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
       - run: cd auth && docker build -t shahab/auth .
       - run: docker login -u $DOCKER_USERNAME -p $DOCKER_PASS
         env:
