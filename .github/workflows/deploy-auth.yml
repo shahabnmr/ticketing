@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - run: cd auth && docker build -t shahab/auth .
+      - run: cd auth && docker build -t shahabnamvar/auth .
       - run: docker login -u $DOCKER_USERNAME -p $DOCKER_PASS
         env:
           DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
