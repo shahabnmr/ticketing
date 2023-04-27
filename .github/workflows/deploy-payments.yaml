@@ -1,0 +1,20 @@
+name: deploy-payments
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'payments/**'
+
+jobs:
+  deployment:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - run: cd payments && docker build -t shahabnamvar/payments .
+      - run: docker login -u $DOCKER_USERNAME -p $DOCKER_PASS
+        env:
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          DOCKER_PASS: ${{ secrets.DOCKER_PASS }}
+      - run: docker push shahabnamvar/payments
