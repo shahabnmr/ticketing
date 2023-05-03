@@ -52,6 +52,7 @@ router.post(
       id: payment.id,
       orderId: payment.orderId,
       stripeId: payment.stripeId,
+      email: req.currentUser!.email,
     });
 
     res.status(201).send({ id: payment.id });
